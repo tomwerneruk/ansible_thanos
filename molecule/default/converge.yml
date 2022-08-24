@@ -2,8 +2,9 @@
 - name: Converge
   hosts: all
   roles:
-    - role: cvi.thanos
+    - role: thanos
       thanos_sidecar: yes
       thanos_query: yes
       thanos_store: yes
       thanos_compactor: yes
+      thanos_receive: yes

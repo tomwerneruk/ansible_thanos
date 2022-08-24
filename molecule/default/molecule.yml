@@ -5,8 +5,10 @@ dependency:
 driver:
   name: docker
 
-lint:
-  name: yamllint
+lint: |
+  yamllint .
+
+role_name_check: 1
 
 platforms:
   - name: Ubuntu_Bionic
