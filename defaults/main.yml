@@ -1,5 +1,5 @@
 ---
-thanos_version: 0.12.2
+thanos_version: 0.27.0
 # Defaults to prometheus for sidecar
 thanos_user: prometheus
 thanos_group: prometheus
@@ -23,6 +23,7 @@ thanos_sidecar_pid_path: /var/run/thanos-sidecar.pid
 thanos_query_pid_path: /var/run/thanos-query.pid
 thanos_store_pid_path: /var/run/thanos-store.pid
 thanos_compactor_pid_path: /var/run/thanos-compactor.pid
+thanos_receive_pid_path: /var/run/thanos-receive.pid
 
 thanos_bucket_config: ""
 
@@ -43,6 +44,10 @@ thanos_store_web_listen_port: "19193"
 thanos_store_web_listen_address: "0.0.0.0:{{ thanos_store_web_listen_port }}"
 thanos_compactor_web_listen_port: "19194"
 thanos_compactor_web_listen_address: "0.0.0.0:{{ thanos_compactor_web_listen_port }}"
+thanos_receive_web_listen_port: "19195"
+thanos_receive_web_listen_address: "0.0.0.0:{{ thanos_receive_web_listen_port }}"
+thanos_receive_write_listen_port: "10907"
+thanos_receive_write_listen_address: "0.0.0.0:{{ thanos_receive_write_listen_port }}"
 
 thanos_sidecar_grpc_listen_port: "19181"
 thanos_sidecar_grpc_listen_address: "0.0.0.0:{{ thanos_sidecar_grpc_listen_port }}"
@@ -50,6 +55,9 @@ thanos_query_grpc_listen_port: "19182"
 thanos_query_grpc_listen_address: "0.0.0.0:{{ thanos_query_grpc_listen_port }}"
 thanos_store_grpc_listen_port: "19183"
 thanos_store_grpc_listen_address: "0.0.0.0:{{ thanos_store_grpc_listen_port }}"
+thanos_receive_grpc_listen_port: "19184"
+thanos_receive_grpc_listen_address: "0.0.0.0:{{ thanos_receive_grpc_listen_port }}"
+
 thanos_store_open_files_limit: 8192
 
 thanos_web_prometheus_url: 'http://localhost:9090/'
@@ -58,6 +66,8 @@ thanos_query_stores: ""
 thanos_query_replica_label: replica
 
 thanos_log_format: json
+
+thanos_receive_replication_factor: 1
 
 thanos_sidecar_flags: >-
         --tsdb.path {{thanos_tsdb_dir}}
@@ -91,3 +101,18 @@ thanos_compactor_flags: >-
         --retention.resolution-1h {{ thanos_1h_retention | default("7300d") }}
         --log.format={{ thanos_log_format }}
         --wait
+
+thanos_receive_external_labels: >-
+        --label "receive_replica=\"0\""
+        --label "receive_cluster=\"my-cluster\""
+
+thanos_receive_flags: >-
+        --tsdb.path "{{ thanos_data_dir }}/receive"
+        --grpc-address {{ thanos_receive_grpc_listen_address }}
+        --http-address {{ thanos_receive_web_listen_address }}
+        --receive.replication-factor {{ thanos_receive_replication_factor }}
+        --receive.local-endpoint 127.0.0.1:10907
+        --remote-write.address {{ thanos_receive_write_listen_address }}
+        --objstore.config-file {{thanos_config_dir}}/bucket_config.yaml
+        --log.format={{ thanos_log_format }}
+        {{ thanos_receive_external_labels }}

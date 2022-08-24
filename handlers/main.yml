@@ -49,3 +49,16 @@
   when:
     - thanos_compactor|bool
     - ansible_service_mgr == 'systemd'
+
+- name: Restart receive service
+  listen:
+    - restart thanos
+    - restart thanos-receive
+    - restart thanos bucket
+  systemd:
+    name: thanos-receive
+    state: restarted
+    daemon_reload: yes
+  when:
+    - thanos_receive|bool
+    - ansible_service_mgr == 'systemd'

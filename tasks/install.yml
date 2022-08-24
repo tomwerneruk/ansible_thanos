@@ -34,6 +34,7 @@
     - "{{ thanos_tsdb_dir }}"
     - "{{ thanos_data_dir }}/compact"
     - "{{ thanos_data_dir }}/store"
+    - "{{ thanos_data_dir }}/receive"
 
 - name: Download thanos server binary
   get_url:

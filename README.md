@@ -52,6 +52,7 @@ Role Variables
 | thanos_query_pid_path | /var/run/thanos-query.pid | PID file for query demon |
 | thanos_store_pid_path | /var/run/thanos-store.pid | PID file for store demon |
 | thanos_compactor_pid_path | /var/run/thanos-compactor.pid | PID file for compactor demon |
+| thanos_receive_pid_path | /var/run/thanos-receive.pid | | PID file for receive demon |
 | thanos_dist_dir       | {{ thanos_root_dir }}/dist | Dist directory for Thanos |
 | thanos_bin_dir        | {{ thanos_root_dir }}/current | Current release directory for Thanos (linked from dist) |
 
@@ -73,14 +74,23 @@ Role Variables
 | thanos_query_grpc_listen_address | 0.0.0.0:{{ thanos_query_grpc_listen_port }} | Bind address for GRPC on query service |
 | thanos_store_grpc_listen_port | 19183 | GRPC port for store service |
 | thanos_store_grpc_listen_address | 0.0.0.0:{{ thanos_store_grpc_listen_port }}" | Bind address for GRPC on store service |
+| thanos_receive_web_listen_port | "19195" | Listen port for receive HTTP API
+| thanos_receive_web_listen_address | "0.0.0.0:{{ thanos_receive_web_listen_port }}" | Bind address for receive HTTP API
+| thanos_receive_write_listen_port | "10907" | Port for Prometheus Remote Write HTTP API
+| thanos_receive_write_listen_address | "0.0.0.0:{{ thanos_receive_write_listen_port }}" | Bind address for Prometheus Remote Write HTTP API
+| thanos_receive_grpc_listen_port | "19184" | gRPC port for receive service
+| thanos_receive_grpc_listen_address | "0.0.0.0:{{ thanos_receive_grpc_listen_port }}" | gRPC bind address for receive service
+
 
 ### Service parameters ###
-| Name                       | Default Value          | Description           |
-| -------------------------- | ---------------------- | --------------------- |
-| thanos_web_prometheus_url  | http://localhost:9090/ | Address of local Prometheus (for sidecar) |
-| thanos_query_stores        | (empty string)         | List of store flags to pass to querier |
-| thanos_query_replica_label | replica                | Label that  distinguish replica set in HA configurations, for deduplication. |
-| thanos_log_firmat          | json                   | Log format to use for services | 
+| Name                              | Default Value          | Description           |
+| --------------------------------- | ---------------------- | --------------------- |
+| thanos_web_prometheus_url         | http://localhost:9090/ | Address of local Prometheus (for sidecar) |
+| thanos_query_stores               | (empty string)         | List of store flags to pass to querier |
+| thanos_query_replica_label        | replica                | Label that  distinguish replica set in HA configurations, for deduplication. |
+| thanos_log_firmat                 | json                   | Log format to use for services | 
+| thanos_receive_replication_factor | 1                      | Peer replication count when horizontal scalig receive service |
+| thanos_receive_external_labels    | receive_replica=0,receive_cluster=eu1 | label(s) to apply to blocks processed by Thanos Receive
 
 
 ### Service cli flags ###
@@ -90,6 +100,7 @@ Role Variables
 | thanos_query_flags     | -             | Command line flags passed to query demon |
 | thanos_store_flags     | -             | Command line flags passed to store demon |
 | thanos_compactor_flags | -             | Command line flags passed to compactor demon |
+| thanos_receive_flags   | -             | Command line flags passed to receive demon |
 
 ### Internal variables ###
 | Name                | Default Value | Description                           |

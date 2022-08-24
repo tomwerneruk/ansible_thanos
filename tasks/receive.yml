@@ -1,0 +1,50 @@
+---
+- name: Create receive systemd service unit
+  template:
+    src: thanos-receive.service.j2
+    dest: /etc/systemd/system/thanos-receive.service
+    owner: root
+    group: root
+    mode: 0644
+  when:
+    - thanos_receive|bool
+  notify: restart thanos-receive
+
+- name: Ensure thanos-receive service is enabled
+  systemd:
+    daemon_reload: yes
+    name: thanos-receive
+    enabled: yes
+  when:
+    - thanos_receive|bool
+    - ansible_service_mgr == 'systemd'
+  notify: restart thanos-receive
+
+- name: Check if Service Exists
+  stat:
+    path: /etc/systemd/system/thanos-receive.service
+  register: service_status
+  when:
+    - not thanos_receive
+    - thanos_remove_unused|bool
+
+- name: Stop thanos receive
+  systemd:
+    name: thanos-receive
+    state: stopped
+    enabled: yes
+    daemon_reload: yes
+  when:
+    - not thanos_receive
+    - thanos_remove_unused|bool
+    - service_status.stat.exists
+    - ansible_service_mgr == 'systemd'
+
+- name: Remove thanos receive
+  file:
+    path: /etc/systemd/system/thanos-receive.service
+    state: absent
+  when:
+    - not thanos_receive
+    - thanos_remove_unused|bool
+    - ansible_service_mgr == 'systemd'

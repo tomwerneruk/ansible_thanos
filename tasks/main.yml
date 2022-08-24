@@ -13,3 +13,6 @@
 
 - name: Thanos compactor
   include_tasks: compactor.yml
+
+- name: Thanos receive
+  include_tasks: receive.yml
