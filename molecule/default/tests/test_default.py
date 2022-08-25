@@ -41,6 +41,7 @@ def test_compactor(host):
 
     assert f.exists
 
+
 def test_receive(host):
     f = host.file('/etc/systemd/system/thanos-receive.service')
 
